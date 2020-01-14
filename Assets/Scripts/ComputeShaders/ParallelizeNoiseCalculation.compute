@@ -1,0 +1,63 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+    //List<CombineInstance> blockData = new List<CombineInstance>();//this will contain the data for the final mesh
+    //var perlinNoiseList = new List<string>(Mathf.RoundToInt(Mathf.Pow(chunkSize, 3)));
+
+    //perlinNoiseGenerator.ClearCache();
+
+    //for (int x = 0; x <= chunkSize; x++)
+    //{
+
+    //    for (int y = 0; y <= chunkSize; y++)
+    //    {
+
+    //        for (int z = 0; z <= chunkSize; z++)
+    //        {
+    //            var thisPos = new Vector3(x, y, z);
+
+    //            var perlinCoordinates = new Vector3((thisPos.x + offsetX), (thisPos.y + offsetY), (thisPos.z + offsetZ));
+    //            var curPerlinNoise = perlinNoiseGenerator.GetPerlinNoise3D(perlinCoordinates, chunkSize);
+
+    //            if (CheckIfUnderGround(curPerlinNoise, perlinCoordinates, x, y, z))
+    //                continue;
+
+
+    //            perlinNoiseList.Add(curPerlinNoise.ToString());
+    //            //pn = Mathf.Clamp(pn, 0, 1);
+
+    //            if (curPerlinNoise >= tollerance)
+    //            {
+
+    //                var block = Instantiate(voxelPrefab, thisPos, Quaternion.identity, voxelConteiner.transform);
+    //                var blockMesh = block.GetComponent<MeshFilter>();
+
+    //                blockMesh.transform.position = thisPos;
+
+    //                var combineIstance = new CombineInstance
+    //                {
+    //                    mesh = blockMesh.sharedMesh,
+    //                    transform = blockMesh.transform.localToWorldMatrix,
+    //                };
+
+    //                blockData.Add(combineIstance);//add the data to the list
+    //                Destroy(block);
+
+    //            }
+    //        }
+    //    }
+    //}
+
+    //return blockData;
+
+    Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}
