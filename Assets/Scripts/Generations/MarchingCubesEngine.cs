@@ -1,9 +1,6 @@
 ﻿using Assets.Scripts.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.Generations
@@ -19,7 +16,6 @@ namespace Assets.Scripts.Generations
         int octaves { get; set; } = 2;  //2
         float persistance { get; set; } = 3f; //7
 
-
         public MarchingCubesEngine(NoiseGenerator noiseGenerator, float tollerance, Vector3 offsetVector)
         {
             _noiseGenerator = noiseGenerator;
@@ -28,39 +24,27 @@ namespace Assets.Scripts.Generations
         }
 
 
-        (CombineInstance? combineIstance, int vertexCount) IVoxelGenerator.GetCurrentVoxelCombineInstance(Vector3 position, GameObject voxelPrefab, GameObject voxelConteiner)
+        (CombineInstance? combineIstance, int vertexCount) IVoxelGenerator.GetCurrentVoxelCombineInstance(Vector3 position, GameObject voxelConteiner)
         {
-            var mesh = new Mesh();
-
-
-
-
-            //ottengo per ognuno degli 8 vertici se sono disegnabili o meno
-            var val1 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[0], octaves, persistance) * 10;
-            var val2 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[1], octaves, persistance) * 10;
-            var val3 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[2], octaves, persistance) * 10;
-            var val4 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[3], octaves, persistance) * 10;
-            var val5 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[4], octaves, persistance) * 10;
-            var val6 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[5], octaves, persistance) * 10;
-            var val7 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[6], octaves, persistance) * 10;
-            var val8 = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + tables.offsetForVertexIndex[7], octaves, persistance) * 10;
-
- 
-            //trasformo questo valore in un byte che uso come indice sulla tabella di triangolazione,
-            // questo restituisce che figura che sto cercando di disegnare
-            bool[] boolValues = new bool[]{
-                (val1 >= Tollerance),
-                (val2>= Tollerance),
-                (val3>= Tollerance),
-                (val4 >= Tollerance),
-                (val5>= Tollerance),
-                (val6>= Tollerance),
-                (val7>= Tollerance),
-                (val8 >= Tollerance)
+            var valueList = new List<float>(8)
+            {
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[0]), //, octaves, persistance),
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[1]), //, octaves, persistance),
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[2]), //, octaves, persistance),
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[3]), //, octaves, persistance),
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[4]), //, octaves, persistance),
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[5]), //, octaves, persistance),
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[6]), //, octaves, persistance),
+                _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + tables.offsetForVertexIndex[7])  //, octaves, persistance)
             };
 
+            //trasformo questo valore in un byte che uso come indice sulla tabella di triangolazione,
+            // questo restituisce che figura che sto cercando di disegnare
+            var boolValues = valueList.Select(val => val >= Tollerance).ToArray();
+
             uint cubeIndex = 0;
-            for (int i = 0; i < boolValues.Length; i++)
+
+            for (int i = 0; i < 8; i++)
             {
                 if (boolValues[i])
                     cubeIndex += (uint)(1 << i);
@@ -84,13 +68,13 @@ namespace Assets.Scripts.Generations
                 triangleList.Add(i);
             }
 
+            var mesh = new Mesh();
             mesh.SetVertices(vertices);
             mesh.triangles = triangleList.ToArray();
             mesh.RecalculateNormals();
 
             var originalPos = voxelConteiner.transform.position;
             voxelConteiner.transform.position = position;
-
 
             var combineIstance = new CombineInstance
             {
@@ -109,7 +93,6 @@ namespace Assets.Scripts.Generations
             var indexA = tables.CornerIndexFromEdge[vertex][0];
             var indexB = tables.CornerIndexFromEdge[vertex][1];
 
-
             var relativeCoordinatesA = tables.offsetForVertexIndex[indexA];
             var relativeCoordinatesB = tables.offsetForVertexIndex[indexB];
 
@@ -118,8 +101,8 @@ namespace Assets.Scripts.Generations
             if (smoother)
             {
                 //ottengo il peso dei due indici
-                var noiseA = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + relativeCoordinatesA, octaves, persistance) * 10;
-                var noiseB = _noiseGenerator.GetOctavePerlin3D(position + _offsetVectorForNoise + relativeCoordinatesB, octaves, persistance) * 10;
+                var noiseA = _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + relativeCoordinatesA) * 10;
+                var noiseB = _noiseGenerator.Get3dNoise(position + _offsetVectorForNoise + relativeCoordinatesB) * 10;
 
                 var difference = noiseA - noiseB;
 
@@ -137,8 +120,6 @@ namespace Assets.Scripts.Generations
                 }
 
             }
-
-
 
             return position + localVertex;
         }

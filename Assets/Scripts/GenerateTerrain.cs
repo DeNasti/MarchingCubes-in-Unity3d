@@ -1,10 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using System.Linq;
-using System;
-using Assets.Scripts.Utils;
 using Assets.Scripts.Generations;
 
 public class GenerateTerrain : MonoBehaviour
@@ -15,14 +12,12 @@ public class GenerateTerrain : MonoBehaviour
     [SerializeField]
     private float verticalChunkSize = 32;
 
-
     public bool changeOffsetOnRefresh;
 
 
     // [Range(0f, 0.9f)]
     public float tollerance = 0.5f;
 
-    public GameObject voxelPrefab;
     public GameObject voxelConteiner;
 
     public Material material;
@@ -47,14 +42,12 @@ public class GenerateTerrain : MonoBehaviour
         voxelGen = new MarchingCubesEngine(noiseGenerator, tollerance, new Vector3(offsetX, offsetY, offsetZ));//CubeVoxelGenerator(perlinNoiseGenerator, tollerance, new Vector3(offsetX, offsetY, offsetZ));
         GenerateRandomOffsets();
         StartCoroutine("Generate");
-
     }
     private void Update()
     {
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Debug.Log("space");
             GenerateRandomOffsets();
             StartCoroutine("Generate");
         }
@@ -74,19 +67,20 @@ public class GenerateTerrain : MonoBehaviour
         {
             for (int y = 0; y <= verticalChunkSize; y++)
             {
+
                 for (int z = 0; z <= chunkSize; z++)
                 {
                     var thisPos = new Vector3(x, y, z);
 
-                   var (combineIstance, curVerticesCount) = voxelGen.GetCurrentVoxelCombineInstance(thisPos, voxelPrefab, voxelConteiner);
+                    var (combineIstance, curVerticesCount) = voxelGen.GetCurrentVoxelCombineInstance(thisPos, voxelConteiner);
 
-                    if(combineIstance != null)
+                    if (combineIstance != null)
                         blockData.Add((CombineInstance)combineIstance);
 
                     totVerticisOfThisMesh += curVerticesCount;
-                    
+
                     //if there are enough vertices, draw this mesh and reset counters
-                    if (totVerticisOfThisMesh >= maxVertices )
+                    if (totVerticisOfThisMesh >= maxVertices)
                     {
                         GenerateSingleMeshFromCombineIstanceArray(blockData.ToArray());
                         blockData = new List<CombineInstance>();
@@ -103,7 +97,7 @@ public class GenerateTerrain : MonoBehaviour
             GenerateSingleMeshFromCombineIstanceArray(blockData.ToArray());
         }
 
-        Debug.Log("ended");
+        Debug.Log($"ended");
         yield return null;
     }
 
@@ -116,7 +110,7 @@ public class GenerateTerrain : MonoBehaviour
         mr.material = material;
         mf.mesh.CombineMeshes(combineList);
         meshes.Add(g);
-        g.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;//setting colliders takes more time. disabled for testing.
+        //g.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;//setting colliders takes more time. disabled for testing.
     }
 
 
@@ -133,11 +127,11 @@ public class GenerateTerrain : MonoBehaviour
 
     void GenerateRandomOffsets()
     {
-        offsetX = UnityEngine.Random.Range(0f, 300f);
-        offsetY = UnityEngine.Random.Range(0f, 300f);
-        offsetZ = UnityEngine.Random.Range(0f, 300f);
+        offsetX = Random.Range(0f, 300f);
+        offsetY = Random.Range(0f, 300f);
+        offsetZ = Random.Range(0f, 300f);
 
-       if(changeOffsetOnRefresh)
+        if (changeOffsetOnRefresh)
             voxelGen.SetOffsets(new Vector3(offsetX, offsetY, offsetZ));
 
         voxelGen.Tollerance = tollerance;

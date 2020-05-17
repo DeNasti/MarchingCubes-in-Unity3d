@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.Generations
 {
@@ -11,7 +6,7 @@ namespace Assets.Scripts.Generations
     {
         float Tollerance { get; set; }
 
-        (CombineInstance? combineIstance, int vertexCount) GetCurrentVoxelCombineInstance(Vector3 position, GameObject voxelPrefab, GameObject voxelConteiner);
+        (CombineInstance? combineIstance, int vertexCount) GetCurrentVoxelCombineInstance(Vector3 position, GameObject voxelConteiner);
         void SetOffsets(Vector3 offsetVector);
 
     }

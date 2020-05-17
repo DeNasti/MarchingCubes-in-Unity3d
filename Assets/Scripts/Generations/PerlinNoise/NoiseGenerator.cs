@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,25 +18,8 @@ public class NoiseGenerator
         Scale = scale;
     }
 
-    [Obsolete()]
-    public float GetPerlinNoise3D(Vector3 coordinates)
-    {
-        var key = $"{coordinates.x}_{coordinates.y}_{coordinates.z}";
-
-        if (_cache.TryGetValue(key, out var outVal))
-        {
-            return outVal;
-        }
-
-
-        var pn = GetPerlinNoise3D(coordinates.x, coordinates.y, coordinates.z);
-        _cache.Add(key, pn);
-        return pn;
-    }
-         
     public float GetPerlinNoise3D(float x, float y, float z)
     {
-
         x /= Scale;
         y /= Scale;
         z /= Scale;
@@ -55,16 +37,16 @@ public class NoiseGenerator
     }
 
 
-    public float GetOctavePerlin3D(Vector3 coordinates, int octaves, float persistence)
+    public float Get3dNoise(Vector3 coordinates) //, int octaves, float persistence)
     {
-        var key = $"{coordinates.x}_{coordinates.y}_{coordinates.z}_{octaves}_{persistence}";
+        var key = $"{coordinates.x}_{coordinates.y}_{coordinates.z}"; // _{octaves}_{persistence}";
 
         if (_cache.TryGetValue(key, out var outVal))
         {
             return outVal;
         }
 
-        var pn = OctavePerlin(coordinates.x, coordinates.y, coordinates.z, octaves, persistence);
+        var pn = GetPerlinNoise3D(coordinates.x, coordinates.y, coordinates.z );
 
         _cache.Add(key, pn);
         return pn;
@@ -90,8 +72,6 @@ public class NoiseGenerator
 
         return total / maxValue;
     }
-
-
 
     public void ClearCache()
     {
