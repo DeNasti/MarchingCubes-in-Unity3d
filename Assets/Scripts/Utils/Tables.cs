@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.Utils
 {
@@ -11,7 +6,7 @@ namespace Assets.Scripts.Utils
     {
 
         //avendo un triangolo in cui ho i vertici numerati (base 0-1-2-3, lato superiore 4-5-6-7)
-        //e i 12 spigoli sono numerati da 0-11 ( i primi 4 sulla base, i secondi 4 sulla faccia superiore e i restanti 4 come "pilatri")
+        //e i 12 spigoli sono numerati da 0-11 ( i primi 4 sulla base, i secondi 4 sulla faccia superiore e i restanti 4 come "pilastri")
         // questo array ritorna, usando come indice lo spigolo, i due vertici che lo intersecano.
         public readonly int[][] CornerIndexFromEdge = new int[12][]
         {
@@ -29,10 +24,12 @@ namespace Assets.Scripts.Utils
                 new int[2] { 3,7 }  //11
         };
 
-        //using as index the vertex number, int returns a vector3 that rappresent the distance from 
+        /// <summary>
+        /// using as index the vertex number, int returns a vector3 that rappresent the distance from the center for that vertex
+        /// </summary>
         public Vector3[] offsetForVertexIndex = new Vector3[]
         {
-            new Vector3(-.5f, +.5f, -.5f),
+            new Vector3(-.5f, +.5f, -.5f), //0
             new Vector3(-.5f, +.5f, +.5f),
             new Vector3(-.5f, -.5f, +.5f),
             new Vector3(-.5f, -.5f, -.5f), //3
@@ -40,15 +37,6 @@ namespace Assets.Scripts.Utils
             new Vector3(+.5f, +.5f, +.5f),
             new Vector3(+.5f, -.5f, +.5f),
             new Vector3(+.5f, -.5f, -.5f), //7
-            //new Vector3(-.5f, +.5f, -.5f),
-            //new Vector3(+.5f, +.5f, -.5f),
-            //new Vector3(+.5f, -.5f, -.5f),
-            //new Vector3(-.5f, -.5f, -.5f), //3
-            //new Vector3(-.5f, +.5f, +.5f),
-            //new Vector3(+.5f, +.5f, +.5f),
-            //new Vector3(+.5f, -.5f, +.5f),
-            //new Vector3(-.5f, -.5f, +.5f), //7
-
         };
 
         public readonly int[][] triTable = new int[256][]{

@@ -13,25 +13,21 @@ public class GenerateTerrain : MonoBehaviour
     private float verticalChunkSize = 32;
 
     public bool changeOffsetOnRefresh;
-
-
-    // [Range(0f, 0.9f)]
+    
+    [Range(0f, 0.9f)]
     public float tollerance = 0.5f;
 
-    public GameObject voxelConteiner;
-
     public Material material;
-
-    private List<GameObject> meshes = new List<GameObject>();
     NoiseGenerator noiseGenerator;
+    private readonly List<GameObject> meshes = new List<GameObject>();
 
     public float scale = 20f;
 
     private float offsetX = 0;
     private float offsetY = 0;
     private float offsetZ = 0;
-
-    private int maxVertices = 30000;//65500;
+    
+    private readonly int maxVerticesInOneMesh = 30000;
 
     private IVoxelGenerator voxelGen;
 
@@ -43,9 +39,9 @@ public class GenerateTerrain : MonoBehaviour
         GenerateRandomOffsets();
         StartCoroutine("Generate");
     }
+
     private void Update()
     {
-
         if (Input.GetKeyDown(KeyCode.P))
         {
             GenerateRandomOffsets();
@@ -53,7 +49,7 @@ public class GenerateTerrain : MonoBehaviour
         }
     }
 
-    IEnumerator Generate()
+    private IEnumerator Generate()
     {
         CleanMeshList();
 
@@ -72,7 +68,7 @@ public class GenerateTerrain : MonoBehaviour
                 {
                     var thisPos = new Vector3(x, y, z);
 
-                    var (combineIstance, curVerticesCount) = voxelGen.GetCurrentVoxelCombineInstance(thisPos, voxelConteiner);
+                    var (combineIstance, curVerticesCount) = voxelGen.GetCurrentVoxelCombineInstance(thisPos, this.gameObject);
 
                     if (combineIstance != null)
                         blockData.Add((CombineInstance)combineIstance);
@@ -80,7 +76,7 @@ public class GenerateTerrain : MonoBehaviour
                     totVerticisOfThisMesh += curVerticesCount;
 
                     //if there are enough vertices, draw this mesh and reset counters
-                    if (totVerticisOfThisMesh >= maxVertices)
+                    if (totVerticisOfThisMesh >= maxVerticesInOneMesh)
                     {
                         GenerateSingleMeshFromCombineIstanceArray(blockData.ToArray());
                         blockData = new List<CombineInstance>();
@@ -104,17 +100,14 @@ public class GenerateTerrain : MonoBehaviour
     private void GenerateSingleMeshFromCombineIstanceArray(CombineInstance[] combineList)
     {
         var g = new GameObject("MeshContainer");
-        g.transform.parent = voxelConteiner.transform;
+        g.transform.parent = this.gameObject.transform;
         MeshFilter mf = g.AddComponent<MeshFilter>();
         MeshRenderer mr = g.AddComponent<MeshRenderer>();
         mr.material = material;
         mf.mesh.CombineMeshes(combineList);
         meshes.Add(g);
-        //g.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;//setting colliders takes more time. disabled for testing.
+        g.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;//setting colliders takes more time. disabled for testing.
     }
-
-
-
 
     void CleanMeshList()
     {
@@ -132,7 +125,9 @@ public class GenerateTerrain : MonoBehaviour
         offsetZ = Random.Range(0f, 300f);
 
         if (changeOffsetOnRefresh)
+        {
             voxelGen.SetOffsets(new Vector3(offsetX, offsetY, offsetZ));
+        }
 
         voxelGen.Tollerance = tollerance;
         noiseGenerator.Scale = scale;

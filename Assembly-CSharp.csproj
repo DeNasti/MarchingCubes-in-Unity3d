@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Entities\MeshData.cs" />
     <Compile Include="Assets\Scripts\GenerateTerrain.cs" />
     <Compile Include="Assets\Scripts\Generations\IVoxelGenerator.cs" />
     <Compile Include="Assets\Scripts\Generations\MarchingCubesEngine.cs" />
